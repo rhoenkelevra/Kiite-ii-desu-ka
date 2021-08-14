@@ -13,26 +13,15 @@ type AuthContextType = {
 };
 
 type AuthContextProviderProps = {
-    children: ReactNode; //children get this type
+    children: ReactNode; //children pros get this type
 };
 
-// create the context,pass the context format (ie. string, '')
-// export const TestContext = createContext({} as any);
-// the receiver can't figure out it's type, so for now avoid this put as any
 export const AuthContext = createContext({} as AuthContextType);
 
 export function AuthContextProvider(props: AuthContextProviderProps) {
-    // useState to create the value and the func to pass it to context
-    // so all components that have access to it, can receive the value
-    // and also change the value using that func
-    // const [value, setValue] = useState('Teste');
     const [user, setUser] = useState<User>();
 
     // ======= Retrieve User Info ==========
-    // useEffect a hook that is a function that fires when something happend (component life cycle)
-    // first param is the function, the second is the event, as a vector [])
-    // [] fires when page is loaded
-    // [user] fires when the user value has change
     useEffect(() => {
         // check with firebase if user had auth before
         const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -51,10 +40,6 @@ export function AuthContextProvider(props: AuthContextProviderProps) {
                 });
             }
         });
-        // good practice to when subscribing to an event listenerb with useEffect like the onAuthStateChanged
-        // to at the to turn it off, so it won't keep fireing even when the component has changed
-        // to do it, we put the above func in a variable, (const unsubscribe)
-        // then return it
         return () => {
             unsubscribe();
         };
@@ -78,11 +63,9 @@ export function AuthContextProvider(props: AuthContextProviderProps) {
         }
     }
     return (
-        //  pass the state to the provider as obj
-        //  <TestContext.Provider value={{ value, setValue }}>
-        //  in this case we pass the signIn so other pages can use this feature
         <AuthContext.Provider value={{ user, signInWithGoogle }}>
             {props.children}
+            {/* the childres are the components inside of the context, so we pass them here */}
         </AuthContext.Provider>
     );
 }

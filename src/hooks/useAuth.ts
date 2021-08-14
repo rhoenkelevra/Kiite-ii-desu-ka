@@ -11,5 +11,5 @@ export function useAuth() {
  * Every time that we want to use the Authcontext, we have to make 2 imports
  * the useContext and the AutContext
  *
- * to make it simpler, we create this hook that transforms 2 in one
+ * to make this simpler, we create this hook that transforms 2 in one
  */
