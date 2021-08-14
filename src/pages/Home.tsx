@@ -1,6 +1,11 @@
 import { useHistory } from 'react-router-dom';
 import { auth, firebase } from '../services/firebase';
 
+// import the provide and the react useContext
+import { useContext } from 'react';
+// import { TestContext } from '../App';
+import { AuthContext } from '../App';
+
 import illustrationImg from '../assets/illustration.svg';
 import logoImg from '../assets/logo.svg';
 import googleIconImg from '../assets/google-icon.svg';
@@ -9,13 +14,16 @@ import { Button } from '../components/Button';
 import '../styles/auth.scss';
 
 export function Home() {
+    // router useHistory: navigate pages when using buttons instead of link
     const history = useHistory();
+    // getting the context from the provide
+    const { user, signInWithGoogle } = useContext(AuthContext);
 
-    function handleCreateRoom() {
-        const provider = new firebase.auth.GoogleAuthProvider();
-        auth.signInWithPopup(provider).then((res) => {
-            console.log(res);
-        });
+    async function handleCreateRoom() {
+        if (!user) {
+            await signInWithGoogle();
+        }
+
         history.push('/rooms/new');
     }
 
