@@ -1,23 +1,18 @@
 import { useHistory } from 'react-router-dom';
-import { auth, firebase } from '../services/firebase';
-
-// import the provide and the react useContext
-import { useContext } from 'react';
-// import { TestContext } from '../App';
-import { AuthContext } from '../App';
 
 import illustrationImg from '../assets/illustration.svg';
 import logoImg from '../assets/logo.svg';
 import googleIconImg from '../assets/google-icon.svg';
-import { Button } from '../components/Button';
-
 import '../styles/auth.scss';
+
+import { Button } from '../components/Button';
+import { useAuth } from '../hooks/useAuth';
 
 export function Home() {
     // router useHistory: navigate pages when using buttons instead of link
     const history = useHistory();
     // getting the context from the provide
-    const { user, signInWithGoogle } = useContext(AuthContext);
+    const { user, signInWithGoogle } = useAuth();
 
     async function handleCreateRoom() {
         if (!user) {
