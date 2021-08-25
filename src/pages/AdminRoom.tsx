@@ -1,15 +1,12 @@
-import { FormEvent, useState } from 'react';
-import { toast } from 'react-hot-toast';
 import { useParams } from 'react-router-dom';
-import { database } from '../services/firebase';
 
-import logoImg from '../assets/logo.svg';
-import '../styles/room.scss';
-import { useAuth } from '../hooks/useAuth';
-import { Button } from '../components/Button';
-import { RoomCode } from '../components/RoomCode';
-import { Question } from '../components/Question';
-import { useRoom } from '../hooks/useRoom';
+import logoImg from 'assets/logo.svg';
+import 'styles/room.scss';
+// import { useAuth } from 'hooks/useAuth';
+import { Button } from 'components/Button';
+import { Question } from 'components/Question';
+import { RoomCode } from 'components/RoomCode';
+import { useRoom } from 'hooks/useRoom';
 
 type RoomParams = {
     id: string;
@@ -23,33 +20,9 @@ export function AdminRoom() {
     // so create a type for it and insert as generic
     const roomId = params.id;
 
-    const [newQuestion, setNewQuestion] = useState('');
-    const { user } = useAuth();
+    // const [newQuestion, setNewQuestion] = useState('');
+    // const { user } = useAuth();
     const { questions, title } = useRoom(roomId);
-
-    async function handleSendQuestion(e: FormEvent) {
-        e.preventDefault();
-        if (newQuestion.trim() === '') {
-            toast.error('Question form was empty');
-            return;
-        }
-        if (!user) {
-            toast.error('You must be logged in');
-        }
-        const question = {
-            content: newQuestion,
-            author: {
-                name: user?.name,
-                avatar: user?.avatar,
-            },
-            isHighLighted: false,
-            isAnswered: false,
-        };
-
-        await database.ref(`rooms/${roomId}/questions`).push(question);
-        toast.success('Question send with success!');
-        setNewQuestion('');
-    }
 
     return (
         <div id="page-room">

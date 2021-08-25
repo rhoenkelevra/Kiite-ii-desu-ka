@@ -22,9 +22,17 @@ type FirebaseQuestions = Record<
         content: string;
         isAnswered: string;
         isHighLighted: string;
+        // Record takes 2 ags
+        likes: Record<
+            string,
+            {
+                authoId: string;
+            }
+        >;
     }
 >;
 
+// This component will render the questions loading
 export function useRoom(roomId: string) {
     // set the question list as state
     const [questions, setQuestions] = useState<Question[]>([]);
@@ -49,6 +57,8 @@ export function useRoom(roomId: string) {
                             author: value.author,
                             isHighLighted: value.isHighLighted,
                             isAnswered: value.isAnswered,
+
+                            likeCount: Object.values(value.likes ?? {}).length,
                         };
                     },
                 );

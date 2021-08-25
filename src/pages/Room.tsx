@@ -1,21 +1,22 @@
 import { FormEvent, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { useParams } from 'react-router-dom';
-import { database } from '../services/firebase';
+import { database } from 'services/firebase';
 
-import logoImg from '../assets/logo.svg';
+import logoImg from 'assets/logo.svg';
 import '../styles/room.scss';
-import { useAuth } from '../hooks/useAuth';
-import { Button } from '../components/Button';
-import { RoomCode } from '../components/RoomCode';
-import { Question } from '../components/Question';
-import { useRoom } from '../hooks/useRoom';
+
+import { useAuth } from 'hooks/useAuth';
+import { useRoom } from 'hooks/useRoom';
+
+import { Button } from 'components/Button';
+import { RoomCode } from 'components/RoomCode';
+import { Question } from 'components/Question';
 
 type RoomParams = {
     id: string;
 };
 
-// type for db result as obj
 export function Room() {
     // get the room id from url
     const params = useParams<RoomParams>();
@@ -50,7 +51,13 @@ export function Room() {
         toast.success('Question send with success!');
         setNewQuestion('');
     }
-    const handleLikeQuestion = (querstionId: string) => {};
+    async function handleLikeQuestion(questionId: string) {
+        await database
+            .ref(`rooms/${roomId}/questions/${questionId}/likes`)
+            .push({
+                authorId: user?.id,
+            });
+    }
 
     return (
         <div id="page-room">
@@ -64,6 +71,7 @@ export function Room() {
             <main>
                 <div className="room-title">
                     <h1>Sala {title}</h1>
+                    {/* shorthand for ternary conditional */}
                     {questions.length > 0 && (
                         <span>{questions.length} perguntas</span>
                     )}
@@ -71,11 +79,14 @@ export function Room() {
                 <form onSubmit={handleSendQuestion}>
                     <textarea
                         placeholder="O que você quer perguntar?"
+                        // set state as the input
                         onChange={(e) => setNewQuestion(e.target.value)}
+                        // set the value as the state, so both will be synced
                         value={newQuestion}
                     />
                     <div className="form-footer">
                         {user ? (
+                            // if there is user, get info
                             <div className="user-info">
                                 <img src={user.avatar} alt={user.name} />
                                 <span>{user.name}</span>
@@ -99,10 +110,15 @@ export function Room() {
                                 key={question.id}
                                 content={question.content}
                                 author={question.author}>
+                                {/* like btn */}
                                 <button
                                     className="like-button"
                                     type="button"
-                                    aria-label="marcar como gostei">
+                                    aria-label="marcar como gostei"
+                                    // onClick accepts a fn, not fn call
+                                    onClick={() =>
+                                        handleLikeQuestion(question.id)
+                                    }>
                                     <span>10</span>
                                     <svg
                                         width="24"
