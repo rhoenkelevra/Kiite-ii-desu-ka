@@ -1,5 +1,6 @@
 import { useHistory } from 'react-router-dom';
 import { FormEvent, useState } from 'react';
+import { toast } from 'react-hot-toast';
 
 import illustrationImg from '../assets/illustration.svg';
 import logoImg from '../assets/logo.svg';
@@ -36,6 +37,11 @@ export function Home() {
             alert('Room does not exit');
             return;
         }
+        if (roomRef.val().endedAt) {
+            toast.error('room already closed');
+            return;
+        }
+
         // navigate for the page
         history.push(`/rooms/${roomCode}`);
     }

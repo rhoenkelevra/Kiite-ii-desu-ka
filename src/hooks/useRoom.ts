@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { database } from '../services/firebase';
+import { useAuth } from './useAuth';
 
 type Question = {
     id: string;
@@ -10,6 +11,8 @@ type Question = {
     content: string;
     isAnswered: string;
     isHighLighted: string;
+    likeCount: number;
+    likeId: string | undefined;
 };
 
 type FirebaseQuestions = Record<
@@ -26,7 +29,7 @@ type FirebaseQuestions = Record<
         likes: Record<
             string,
             {
-                authoId: string;
+                authorId: string;
             }
         >;
     }
@@ -34,6 +37,8 @@ type FirebaseQuestions = Record<
 
 // This component will render the questions loading
 export function useRoom(roomId: string) {
+    // get user ID to manage hasLiked
+    const { user } = useAuth();
     // set the question list as state
     const [questions, setQuestions] = useState<Question[]>([]);
     const [title, setTitle] = useState('');
@@ -59,15 +64,25 @@ export function useRoom(roomId: string) {
                             isAnswered: value.isAnswered,
 
                             likeCount: Object.values(value.likes ?? {}).length,
+
+                            likeId: Object.entries(value.likes ?? {}).find(
+                                ([key, like]) => like.authorId === user?.id,
+                            )?.[0],
                         };
                     },
                 );
                 setTitle(databaseRoom.title);
                 setQuestions(parsedQuestions);
             });
+            // to unsubscribe from all event listeners
+            // firebase off method
+            return () => {
+                roomRef.off('value');
+            };
         },
         // roomId as dependecy so if the user navigates to another page, will refresh the list
-        [roomId],
+        [roomId, user?.id],
+        // user?.id is a variable that comes from outside the useEffect, so we pass as dependency of the useEffect. So if the userId changes, it will reload the questions
     );
     return { questions, title };
 }

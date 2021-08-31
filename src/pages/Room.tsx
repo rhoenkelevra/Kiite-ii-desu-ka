@@ -48,15 +48,26 @@ export function Room() {
         };
 
         await database.ref(`rooms/${roomId}/questions`).push(question);
-        toast.success('Question send with success!');
+        toast.success('Question sent with success!');
         setNewQuestion('');
     }
-    async function handleLikeQuestion(questionId: string) {
-        await database
-            .ref(`rooms/${roomId}/questions/${questionId}/likes`)
-            .push({
-                authorId: user?.id,
-            });
+
+    async function handleLikeQuestion(
+        questionId: string,
+        likeId: string | undefined,
+    ) {
+        if (likeId) {
+            // remove like
+            await database
+                .ref(`rooms/${roomId}/questions/${questionId}/likes/${likeId}`)
+                .remove();
+        } else {
+            await database
+                .ref(`rooms/${roomId}/questions/${questionId}/likes`)
+                .push({
+                    authorId: user?.id,
+                });
+        }
     }
 
     return (
@@ -70,15 +81,15 @@ export function Room() {
 
             <main>
                 <div className="room-title">
-                    <h1>Sala {title}</h1>
+                    <h1>Room {title}</h1>
                     {/* shorthand for ternary conditional */}
                     {questions.length > 0 && (
-                        <span>{questions.length} perguntas</span>
+                        <span>{questions.length} questions</span>
                     )}
                 </div>
                 <form onSubmit={handleSendQuestion}>
                     <textarea
-                        placeholder="O que você quer perguntar?"
+                        placeholder="What do you want to ask?"
                         // set state as the input
                         onChange={(e) => setNewQuestion(e.target.value)}
                         // set the value as the state, so both will be synced
@@ -93,13 +104,13 @@ export function Room() {
                             </div>
                         ) : (
                             <span>
-                                Para enviar uma pergunta,
-                                <button>faça seu login</button>.
+                                To send a question,
+                                <button>login</button>.
                             </span>
                         )}
 
                         <Button type="submit" disabled={!user}>
-                            Enviar Pergunta
+                            Send Question
                         </Button>
                     </div>
                 </form>
@@ -112,14 +123,21 @@ export function Room() {
                                 author={question.author}>
                                 {/* like btn */}
                                 <button
-                                    className="like-button"
+                                    className={`like-button ${
+                                        question.likeId ? 'liked' : ''
+                                    }`}
                                     type="button"
                                     aria-label="marcar como gostei"
                                     // onClick accepts a fn, not fn call
                                     onClick={() =>
-                                        handleLikeQuestion(question.id)
+                                        handleLikeQuestion(
+                                            question.id,
+                                            question.likeId,
+                                        )
                                     }>
-                                    <span>10</span>
+                                    {question.likeCount > 0 && (
+                                        <span>{question.likeCount}</span>
+                                    )}
                                     <svg
                                         width="24"
                                         height="24"

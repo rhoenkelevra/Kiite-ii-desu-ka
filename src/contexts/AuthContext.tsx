@@ -40,6 +40,9 @@ export function AuthContextProvider(props: AuthContextProviderProps) {
                 });
             }
         });
+        // In case the component is no longer in display
+        // we cancel all the event listeners
+        // to to so we just return it
         return () => {
             unsubscribe();
         };
